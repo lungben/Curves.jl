@@ -124,12 +124,31 @@ end
 # Applying Functions
 
 """
-Applies a 2-argument function ˋf(x,y)ˋ to each entry of the Curve.
+Applies a 2-argument function ˋf(x,y)=zˋ to each entry of the Curve.
 """
 function apply(f:: Function, c1:: Curve;
         logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
     y = f.(c1.x, c1.y)
     Curve(c1.x, y, logx=logx, logy=logy, method=method, extrapolation=extrapolation)
+end
+
+
+"""
+Applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
+ˋaxisˋ can be ˋ:xˋ or ˋ:yˋ.
+"""
+function apply(f:: Function, c1:: Curve, axis:: Symbol;
+        logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
+    if axis==:x
+        x = f.(c1.x)
+        y = c1.y
+    elseif axis==:y
+        x = c1.x
+        y = f.(c1.y)
+    else
+        error("axis must be :x or :y, $axis is not allowed")
+    end
+    Curve(x, y, logx=logx, logy=logy, method=method, extrapolation=extrapolation)
 end
 
 end # module
