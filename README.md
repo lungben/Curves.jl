@@ -20,7 +20,9 @@ Operations between 2 Curve objects (noted as ˋc1ˋ and ˋc2ˋ) are defined as f
 3. Repeat steps 1. and 2., but interpolate ˋc2ˋ to the x-values of ˋc1ˋ.
 4. Combine the results of both interpolations and create a new Curve object for the result.
 
-Technically, this package is based on Interpolations.jl.
+Technically, this package is based on Interpolations.jl. 
+
+Linear, Quadratic and Cubic Spline interpolation is supported by Interpolations.jl. Support of log-interpolation on both axis is added by this package.
 
 ˋCurveˋ objects are defined to be immutable, thus every operation creates a new Curve object as output.
 
@@ -35,6 +37,7 @@ tbd
 
 ## Plans for Further Improvements
 
-* Multi-dimensional structures (especially 2d, e.g. for Vola surfaces)
+* Proper tests and documentation
 * Support of more operations
 * Interactions with QuantLib.jl curve objects
+* Multi-dimensional structures (especially 2d, e.g. for Vola surfaces)
