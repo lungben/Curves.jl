@@ -19,11 +19,12 @@ end
 Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
 
-Curve(c1:: Curve; method=c1.method, extrapolation=c1.extrapolation, logx=c1.logx, logy=c1.logy) = 
-    Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
-
 getitpm(c1:: Curve) = c1.etp.itp.it
 getetpm(c1:: Curve) = c1.etp.et
+
+Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) = 
+    Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
+
 Base.Broadcast.broadcastable(q:: Curve) = Ref(q) # treat it as a scalar in broadcasting
 
 # Interpolation
