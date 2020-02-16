@@ -124,29 +124,23 @@ end
 # Applying Functions
 
 """
-Applies a 2-argument function ˋf(x,y)=zˋ to each entry of the Curve.
-"""
-function apply(f:: Function, c1:: Curve;
-        logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
-    y = f.(c1.x, c1.y)
-    Curve(c1.x, y, logx=logx, logy=logy, method=method, extrapolation=extrapolation)
-end
+If ˋaxisˋ is ˋ:xyˋ (default): applies a 2-argument function ˋf(x,y)=zˋ to each entry of the Curve.
 
-
+If ˋaxisˋ is ˋ:xˋ or ˋ:yˋ: applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
 """
-Applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
-ˋaxisˋ can be ˋ:xˋ or ˋ:yˋ.
-"""
-function apply(f:: Function, c1:: Curve, axis:: Symbol;
+function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy,
         logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
-    if axis==:x
+    if axis==:xy
+        x = c1.x
+        y = f.(c1.y)
+    elseif axis==:x
         x = f.(c1.x)
         y = c1.y
     elseif axis==:y
         x = c1.x
         y = f.(c1.y)
     else
-        error("axis must be :x or :y, $axis is not allowed")
+        error("axis must be :xy, :x or :y, the value $axis is not allowed")
     end
     Curve(x, y, logx=logx, logy=logy, method=method, extrapolation=extrapolation)
 end
