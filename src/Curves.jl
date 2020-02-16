@@ -5,8 +5,10 @@ export Curve, interpolate, apply, concat, drop_duplicates
 using Interpolations
 
 # Basic definition
+abstract type AbstractCurve end
+
 struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
-        Titp <: Interpolations.AbstractInterpolation}
+        Titp <: Interpolations.AbstractInterpolation} <: AbstractCurve
     x:: Tx
     y:: Ty
     etp:: Titp
@@ -14,7 +16,7 @@ struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
     logy:: Bool
 end
 
-Curve(x, y; method=Gridded(Linear()), logx=false, logy=false, extrapolation=Flat()) =
+Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method),
         extrapolation), logx, logy)
 
