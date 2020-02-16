@@ -132,7 +132,7 @@ function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy,
         logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
     if axis==:xy
         x = c1.x
-        y = f.(c1.y)
+        y = f.(c1.x, c1.y)
     elseif axis==:x
         x = f.(c1.x)
         y = c1.y
