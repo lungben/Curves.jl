@@ -17,8 +17,10 @@ struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
 end
 
 Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
-    Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method),
-        extrapolation), logx, logy)
+    Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
+
+Curve(c1:: Curve; method=c1.method, extrapolation=c1.extrapolation, logx=c1.logx, logy=c1.logy) = 
+    Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
 
 getitpm(c1:: Curve) = c1.etp.itp.it
 getetpm(c1:: Curve) = c1.etp.et
