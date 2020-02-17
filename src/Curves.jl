@@ -12,16 +12,27 @@ struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
     x:: Tx
     y:: Ty
     etp:: Titp
-    logx:: Bool
-    logy:: Bool
+    logx:: Bool # is x-axis logarithmic?
+    logy:: Bool # is y-axis logarithmic?
 end
 
+"""
+    Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false)
+
+Standard curve constructor.
+"""
 Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
 
-getitpm(c1:: Curve) = c1.etp.itp.it
-getetpm(c1:: Curve) = c1.etp.et
+getitpm(c1:: Curve) = c1.etp.itp.it # helper function to get interpolator
+getetpm(c1:: Curve) = c1.etp.et # helper function to get extrapolator
 
+"""
+    Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy)
+
+Copy constructor to generate a new curve from an existing one.
+The interpolation / extrapolation parameters can be changed.
+"""
 Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) =
     Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
 
@@ -41,7 +52,7 @@ interpolate(xval:: AbstractArray{T} where T, c1:: Curve) =
 
 interpolate(c0:: Curve, c1:: Curve) = interpolate(c0.x, c1)
 
-# Define Operations with Scalars
+# Basic operations
 
 import Base: +, -, *, /, ^, exp, log, length, ==, ≈
 
@@ -49,9 +60,11 @@ length(c1:: Curve):: Int = length(c1.y)
 
 ==(c1:: Curve, c2:: Curve) = c1.x == c2.x && c1.y == c2.y && c1.etp == c2.etp &&
     c1.logx == c2.logx && c1.logy == c2.logy
-    
+
 ≈(c1:: Curve, c2:: Curve) = c1.x ≈ c2.x && c1.y ≈ c2.y && c1.etp ≈ c2.etp &&
     c1.logx ≈ c2.logx && c1.logy ≈ c2.logy
+
+# Define Operations with Scalars
 
 operations = (:+, :-, :*, :/, :^)
 for op in operations
@@ -67,7 +80,7 @@ for op in operations
         logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
 end
 
-# Concatination
+# Helper functions for concatination
 
 @inline function uniquexy(x:: AbstractArray, y:: AbstractArray)
     @inbounds begin
@@ -87,6 +100,8 @@ end
 end
 
 """
+    drop_duplicates(c1:: Curve)
+
 Removes duplicate x values from the curve.
 Note that it is not checked if the corresponding y values are identical,
 just an arbitrary one is kept.
@@ -97,6 +112,8 @@ function drop_duplicates(c1:: Curve)
 end
 
 """
+    concat(c1:: Curve, c2:: Curve; drop_dup=true)
+
 Merges 2 curves.
 Element type is inferred by promotion, interpolation type is taken from 1st curve argument.
 """
@@ -130,6 +147,8 @@ end
 # Applying Functions
 
 """
+    apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
+
 If ˋaxisˋ is ˋ:xyˋ (default): applies a 2-argument function ˋf(x,y)=zˋ to each entry of the Curve.
 
 If ˋaxisˋ is ˋ:xˋ or ˋ:yˋ: applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
