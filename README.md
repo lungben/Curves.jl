@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/lungben/Curves.jl.svg?branch=master)](https://travis-ci.com/lungben/Curves.jl)
+[![codecov](https://codecov.io/gh/lungben/Curves.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/lungben/Curves.jl)
 
 # Curves
 
