@@ -22,7 +22,7 @@ Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=fal
 getitpm(c1:: Curve) = c1.etp.itp.it
 getetpm(c1:: Curve) = c1.etp.et
 
-Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) = 
+Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) =
     Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
 
 Base.Broadcast.broadcastable(q:: Curve) = Ref(q) # treat it as a scalar in broadcasting
@@ -43,9 +43,15 @@ interpolate(c0:: Curve, c1:: Curve) = interpolate(c0.x, c1)
 
 # Define Operations with Scalars
 
-import Base: +, -, *, /, ^, exp, log, length
+import Base: +, -, *, /, ^, exp, log, length, ==, ≈
 
 length(c1:: Curve):: Int = length(c1.y)
+
+==(c1:: Curve, c2:: Curve) = c1.x == c2.x && c1.y == c2.y && c1.etp == c2.etp &&
+    c1.logx == c2.logx && c1.logy == c2.logy
+    
+≈(c1:: Curve, c2:: Curve) = c1.x ≈ c2.x && c1.y ≈ c2.y && c1.etp ≈ c2.etp &&
+    c1.logx ≈ c2.logx && c1.logy ≈ c2.logy
 
 operations = (:+, :-, :*, :/, :^)
 for op in operations
