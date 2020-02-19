@@ -24,6 +24,8 @@ using Test
     # Operations with Scalars
     @test (c1 + 2).y == y1 .+ 2 && (c1 + 2).x == x1
     @test (1/c1).y == 1 ./ y1 && (1/c1).x == x1
+    # test if interpolation object gets correctly updated
+    @test interpolate(5.5, 2c1) ≈ 2((1.204-1.01)/(9-3)*(5.5-3)+1.01)
 
     # Merges
     c1d = Curve([1, 3, 3, 7, 9], [2, 4, 4, 8, 10])
