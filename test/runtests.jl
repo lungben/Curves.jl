@@ -41,23 +41,20 @@ using Test
     @test drop_duplicates(c1d).x == [1, 3, 7, 9]
     @test concat(c1, c1d).x == [1, 3, 7, 9, 18, 30, 91]
 
-    # Operations on Curves - ToDo
-    c1+c1d
-    c1^c1d
+    # Operations on Curves
+    c_sum = c1+c1d
+    @test c_sum.x == sort(unique(hcat(c1.x, c1d.x)))
 
     sumc1 = c1+c1
     @test sumc1.y == (2*c1).y # tests correctness of result
     @test sumc1 == 2c1 # tests comparison operator in addition
 
-    # apply - ToDo
-    apply((t,r) -> exp(-r/100*t), c1)
+    # apply
+    @test apply((t,r) -> exp(-r/100*t), c1, logy=true) isa Curve
     @test apply(x -> 2x, c1, axis=:y) ≈ 2c1
     res = apply(x -> 3x, c1, axis=:x)
     @test res.x == 3c1.x && res.y == c1.y
     res = apply((x, y) -> 2x+y, c1, axis=:xy)
     @test res.x == c1.x && res.y == c1.y .+ 2.0 .* c1.x
-
-
-
 
 end
