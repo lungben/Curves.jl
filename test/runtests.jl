@@ -10,6 +10,15 @@ using Test
     clog = Curve(x2, y2, logx=true, logy=true)
     clogy = Curve(x1, y1, logy=true)
 
+    # equality
+    c2 = Curve(c1)
+    c3 = Curve(c1, logx=true)
+    @test c1 == c2
+    @test c1 ≈ c2
+    @test !(c1 == c3)
+    @test !(c1 ≈ c3)
+
+
     # Interpolation
     @test interpolate(5.5, c1) ≈ (1.204-1.01)/(9-3)*(5.5-3)+1.01
     c_int = interpolate([3, 9, 14, 31, 33], c1)

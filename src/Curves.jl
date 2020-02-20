@@ -62,7 +62,7 @@ length(c1:: Curve):: Int = length(c1.y)
     c1.logx == c2.logx && c1.logy == c2.logy
 
 ≈(c1:: Curve, c2:: Curve) = c1.x ≈ c2.x && c1.y ≈ c2.y && c1.etp ≈ c2.etp &&
-    c1.logx ≈ c2.logx && c1.logy ≈ c2.logy
+    c1.logx == c2.logx && c1.logy == c2.logy
 
 # Define Operations with Scalars
 
