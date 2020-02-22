@@ -74,7 +74,7 @@ using Test
     # calculate log-returns of discount factors
     log_ret = log(c_shifted_df/c_base_df)
     # apply log returns to the base curve - this should give the shifted curve back
-    curve_scenario = *(c_disc_base, exp(log_ret), logy=true)
+    curve_scenario = *(c_base_df, exp(log_ret), logy=true)
     @test curve_scenario ≈ c_shifted_df
 
 end
