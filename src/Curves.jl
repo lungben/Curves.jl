@@ -65,19 +65,21 @@ length(c1:: Curve):: Int = length(c1.y)
     c1.logx == c2.logx && c1.logy == c2.logy
 
 # Define Operations with Scalars
+#=
+For all calculations on curves, the curve settings (interpolator, extrapolator, log axis settings) are taken as default
+unless specified otherwise (they are not copied from input curves). This is to avoid issues e.g. with log-scales
+on potentially negative values.
+=#
 
 operations = (:+, :-, :*, :/, :^)
 for op in operations
-    @eval $op(c1:: Curve, a:: Number) = Curve(c1.x, $op.(c1.y, a),
-        method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
-    @eval $op(a:: Number, c1:: Curve) = Curve(c1.x, $op.(a, c1.y),
-        method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    @eval $op(c1:: Curve, a:: Number; kwargs...) = Curve(c1.x, $op.(c1.y, a); kwargs...)
+    @eval $op(a:: Number, c1:: Curve; kwargs...) = Curve(c1.x, $op.(a, c1.y); kwargs...)
 end
 
 operations = (:exp, :log)
 for op in operations
-    @eval $op(c1:: Curve) = Curve(c1.x, $op.(c1.y), method=getitpm(c1),
-        logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
 end
 
 # Helper functions for concatination
@@ -130,7 +132,7 @@ end
 
 operations = (:+, :-, :*, :/, :^)
 for op in operations
-    @eval function $op(c1:: Curve, c2:: Curve)
+    @eval function $op(c1:: Curve, c2:: Curve; kwargs...)
         if c1.x == c2.x # fast mode if no interpolation is required
             x = c1.x
             y = $op.(c1.y, c2.y)
@@ -140,7 +142,7 @@ for op in operations
             x, y = mergexy(c1.x, y_c1_grid, c2.x, y_c2_grid)
             x, y = uniquexy(x, y)
         end
-        Curve(x, y, logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
+        Curve(x, y; kwargs...)
     end
 end
 
