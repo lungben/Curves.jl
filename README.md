@@ -32,13 +32,32 @@ Linear, Quadratic and Cubic Spline interpolation is supported by [Interpolations
 The use case I had in mind was interest rate / FX curves for mathematical finance applications.
 The `Curve` objects make it easier to shift market data, e.g. for sensitivity or scenario P&L calculation, or to calculate such shift sizes based on market data time series.
 
-## Usage
+Example:
 
-tbd
+```julia
+# construct zero interest rate curve
+c_zero_base = Curve([2, 7, 30, 90, 180, 365], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
 
-## Plans for Further Improvements
+# define zero rate shifts (e.g. for stress testing or sensitivities)
+c_shifts = Curve([2, 185, 360], [0.1, -0.1, 0.2])
 
-* Proper tests and documentation
+# shift curve
+c_shifted = c_zero_base + c_shifts
+
+# calculate discount factors for the unshifted and shifted curves
+c_base_df=apply((x,y) -> exp(-x*y/100/365), c_zero_base, logy=true)
+c_shifted_df = apply((x,y) -> exp(-x*y/100/365), c_shifted, logy=true)
+
+# calculate log-returns of discount factors
+log_ret = log(c_shifted_df/c_base_df)
+
+# apply log returns to the base curve - this should give the shifted curve back
+curve_scenario = *(c_base_df, exp(log_ret), logy=true)
+@assert curve_scenario ≈ c_shifted_df
+```
+
+## Ideas for Further Improvements
+
 * Support of more operations
 * Interactions with [QuantLib.jl](https://github.com/pazzo83/QuantLib.jl) curve objects
 * Multi-dimensional structures (especially 2d, e.g. for Volatility surfaces)
