@@ -149,14 +149,16 @@ end
 # Applying Functions
 
 """
-    apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
+    apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, kwargs...)
 
 If ˋaxisˋ is ˋ:xyˋ (default): applies a 2-argument function ˋf(x,y)=zˋ to each entry of the Curve.
 
 If ˋaxisˋ is ˋ:xˋ or ˋ:yˋ: applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
+
+Thw output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy,
-        logx=c1.logx, logy=c1.logy, method=getitpm(c1), extrapolation=getetpm(c1))
+function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, kwargs...)
     if axis==:xy
         x = c1.x
         y = f.(c1.x, c1.y)
@@ -169,7 +171,7 @@ function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy,
     else
         error("axis must be :xy, :x or :y, the value $axis is not allowed")
     end
-    Curve(x, y, logx=logx, logy=logy, method=method, extrapolation=extrapolation)
+    Curve(x, y; kwargs...)
 end
 
 end # module
