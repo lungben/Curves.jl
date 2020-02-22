@@ -61,4 +61,20 @@ using Test
     res = apply((x, y) -> 2x+y, c1, axis=:xy)
     @test res.x == c1.x && res.y == c1.y .+ 2.0 .* c1.x
 
+    # Test use case in Readme
+    # construct zero interest rate curve
+    c_zero_base = Curve([2, 7, 30, 90, 180, 365], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
+    # define zero rate shifts (e.g. for stress testing or sensitivities)
+    c_shifts = Curve([2, 185, 360], [0.1, -0.1, 0.2])
+    # shift curve
+    c_shifted = c_zero_base + c_shifts
+    # calculate discount factors for the unshifted and shifted curves
+    c_base_df=apply((x,y) -> exp(-x*y/100/365), c_zero_base, logy=true)
+    c_shifted_df = apply((x,y) -> exp(-x*y/100/365), c_shifted, logy=true)
+    # calculate log-returns of discount factors
+    log_ret = log(c_shifted_df/c_base_df)
+    # apply log returns to the base curve - this should give the shifted curve back
+    curve_scenario = *(c_disc_base, exp(log_ret), logy=true)
+    @test curve_scenario ≈ c_shifted_df
+
 end
