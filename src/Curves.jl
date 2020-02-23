@@ -9,11 +9,16 @@ abstract type AbstractCurve end
 
 struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
         Titp <: Interpolations.AbstractInterpolation} <: AbstractCurve
+    "data points x-axis"
     x:: Tx
+    "data points y-axis"
     y:: Ty
+    "Interpolations.jl extrapolation(interpolation) object"
     etp:: Titp
-    logx:: Bool # is x-axis logarithmic?
-    logy:: Bool # is y-axis logarithmic?
+    "is x-axis logarithmic?"
+    logx:: Bool
+    "is y-axis logarithmic?"
+    logy:: Bool
 end
 
 """
@@ -24,8 +29,11 @@ Standard curve constructor.
 Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
 
-getitpm(c1:: Curve) = c1.etp.itp.it # helper function to get interpolator
-getetpm(c1:: Curve) = c1.etp.et # helper function to get extrapolator
+"helper function to get Interpolations.jl interpolation method"
+getitpm(c1:: Curve) = c1.etp.itp.it
+
+"helper function to get Interpolations.jl extrapolation method"
+getetpm(c1:: Curve) = c1.etp.et
 
 """
     Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy)
