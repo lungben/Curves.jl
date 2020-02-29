@@ -1,5 +1,6 @@
 using Curves
 using Test
+using Interpolations
 
 @testset "Curves.jl" begin
     x1 = [3, 9, 18, 30, 91]
