@@ -3,8 +3,6 @@
 
 # Curves
 
-Note that this is work in progress and not suited for any serious usage yet!
-
 ## Introduction
 
 A `Curve` in this package is essentially a collection of points `(x, y)`, together with an interpolation and extrapolation method.
