@@ -87,15 +87,31 @@ Base.Broadcast.broadcastable(q:: Curve) = Ref(q) # treat it as a scalar in broad
 # Interpolation
 import Interpolations: interpolate
 
+"""
+    interpolate(xval:: Real, c1:: Curve)
+
+Returns the interpolated or extrapolated y-value of the curve for a given x-value.
+"""
 function interpolate(xval:: Real, c1:: Curve)
     c = c1.etp(c1.logx ? log(xval) : xval)
     c1.logy ? exp(c) : c
 end
 
+"""
+    interpolate(xval:: AbstractArray{T} where T, c1:: Curve)
+
+Interpolates the curve onto the given array and returns a new Curve instance on the interpolated points.
+"""
 interpolate(xval:: AbstractArray{T} where T, c1:: Curve) =
     Curve(xval, interpolate.(xval, c1), method=getitpm(c1), logx=c1.logx, logy=c1.logy,
         extrapolation=getetpm(c1))
 
+"""
+    interpolate(c0:: Curve, c1:: Curve)
+
+Interpolates the Curve ˋc1ˋ on the x-axis points of the Curve ˋc0ˋ and returns a new Curve instance on the interpolated 
+points.
+"""
 interpolate(c0:: Curve, c1:: Curve) = interpolate(c0.x, c1)
 
 # Basic operations
@@ -104,25 +120,27 @@ import Base: +, -, *, /, ^, exp, log, length, ==, ≈
 
 length(c1:: Curve):: Int = length(c1.y)
 
+# comparisons
 ==(c1:: Curve, c2:: Curve) = c1.x == c2.x && c1.y == c2.y && c1.etp == c2.etp &&
     c1.logx == c2.logx && c1.logy == c2.logy
 
 ≈(c1:: Curve, c2:: Curve) = c1.x ≈ c2.x && c1.y ≈ c2.y && c1.etp ≈ c2.etp &&
     c1.logx == c2.logx && c1.logy == c2.logy
 
-# Define Operations with Scalars
 #=
 For all calculations on curves, the curve settings (interpolator, extrapolator, log axis settings) are taken as default
 unless specified otherwise (they are not copied from input curves). This is to avoid issues e.g. with log-scales
 on potentially negative values.
 =#
 
+# Define operations with scalars
 operations = (:+, :-, :*, :/, :^)
 for op in operations
     @eval $op(c1:: Curve, a:: Number; kwargs...) = Curve(c1.x, $op.(c1.y, a); kwargs...)
     @eval $op(a:: Number, c1:: Curve; kwargs...) = Curve(c1.x, $op.(a, c1.y); kwargs...)
 end
 
+# Define operations where Curve is the only argument
 operations = (:exp, :log)
 for op in operations
     @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
