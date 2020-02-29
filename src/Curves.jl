@@ -54,7 +54,6 @@ Valid choices for ˋmethodˋ are:
 
 * ˋGridded(Linear())ˋ - default
 * ˋGridded(Constant())ˋ
-* ˋNoInterp()ˋ
 
 Valid choices for ˋextrapolationˋ are:
 
