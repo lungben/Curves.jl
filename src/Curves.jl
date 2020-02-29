@@ -4,6 +4,22 @@ export Curve, interpolate, apply, concat, drop_duplicates
 
 using Interpolations
 
+#=
+The Curve object is intended to be immutable, i.e. each operation on it creates a new Curve instance.
+In principle it would be possible to change points of the arrays curve.x or curve.y without creating a new Curve instance,
+but this should be avoided because it may introduce inconsistencies (especially when using log-interpolation).
+In order to have both extrapolation and interpolation, a nested extrapolation(interpolation) object (using Interpolations.jl)
+is created.
+The x and y arrays are passed to the Interpolations.jl interpolator directly if log-interpolation is switched off. In this
+case, the interpolation object contains a pointer to the same array, thus there are no duplicates of the x and y arrays
+in memory. The arrays x and y are mainly kept directly in the Curve struct (and not only inside the interpolation object)
+to avoid problems with type inference.
+However, if log interpolation is activated for one axis, a second array is created for the axis containing
+the log values of the original array and stored in the interpolation object. This results in double memory usage, but 
+allows quick access to both the axis values (via curve.x and curve.y) and interpolated values.
+Note that Interpolation.jl does not support log-interpolation (yet?), therefore it needs to be implemented here explicitly.
+=#
+
 # Basic definition
 abstract type AbstractCurve end
 
