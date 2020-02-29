@@ -38,6 +38,7 @@ using Test
     # test if interpolation object gets correctly updated
     @test interpolate(5.5, 2c1) ≈ 2((1.204-1.01)/(9-3)*(5.5-3)+1.01)
     @test exp(c1).y == exp.(c1.y)
+    @test sin(c1)/cos(c1) ≈ tan(c1)
 
     # Merges
     c1d = Curve([1, 3, 3, 7, 9], [2, 4, 4, 8, 10])
