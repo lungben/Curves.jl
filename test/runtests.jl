@@ -66,8 +66,6 @@ using Interpolations
     # test non-standard interpolators
     c_const = Curve(x1, y1, method=Gridded(Constant()))
     @test interpolate(28, c_const) == 1.81
-    c_noint = Curve(x1, y1, method=NoInterp())
-    @test interpolate(18, c_noint) == 1.54 # does not throw error because 18 is a grid point
     
     # test extrapolations
     @test interpolate(1, c1) == 1.01 # constant extrapolation
