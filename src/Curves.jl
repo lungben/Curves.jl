@@ -41,6 +41,28 @@ end
     Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false)
 
 Standard curve constructor.
+Creates the interpolation/extrapolation object of the curve instance. 
+Interpolation/extrapolation details can be changed using the keyword arguments, defaults are:
+
+* linear interpolation
+* constant extrapolation
+* no logarithmic axes
+
+Note that for method ˋGridded(x)ˋ must be used so that the x-grid can be non-uniform.
+
+Valid choices for ˋmethodˋ are:
+
+* ˋGridded(Linear())ˋ - default
+* ˋGridded(Constant())ˋ
+* ˋNoInterp()ˋ
+
+Valid choices for ˋextrapolationˋ are:
+
+* ˋThrow()ˋ
+* ˋFlat()ˋ - default
+* ˋLine()ˋ
+* a constant value, which is used for filling-
+
 """
 Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
