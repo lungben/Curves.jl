@@ -98,21 +98,25 @@ function interpolate(xval:: Real, c1:: Curve)
 end
 
 """
-    interpolate(xval:: AbstractArray{T} where T, c1:: Curve)
+    interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve
 
 Interpolates the curve onto the given array and returns a new Curve instance on the interpolated points.
+
+The resulting curve instance uses the same interpolation and extrapolation settings as the original one.
 """
-interpolate(xval:: AbstractArray{T} where T, c1:: Curve) =
+interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve =
     Curve(xval, interpolate.(xval, c1), method=getitpm(c1), logx=c1.logx, logy=c1.logy,
         extrapolation=getetpm(c1))
 
 """
-    interpolate(c0:: Curve, c1:: Curve)
+    interpolate(c0:: Curve, c1:: Curve):: Curve
 
 Interpolates the Curve ˋc1ˋ on the x-axis points of the Curve ˋc0ˋ and returns a new Curve instance on the interpolated 
 points.
+
+The resulting curve instance uses the same interpolation and extrapolation settings as ˋc1ˋ.
 """
-interpolate(c0:: Curve, c1:: Curve) = interpolate(c0.x, c1)
+interpolate(c0:: Curve, c1:: Curve):: Curve = interpolate(c0.x, c1)
 
 # Basic operations
 
@@ -148,6 +152,11 @@ end
 
 # Helper functions for concatination
 
+"""
+Removes duplicates in the array x and the entries in the array y which have the same index as the x-duplicates.
+
+Note that it does not check if the y-values for x-value duplicates are the same!
+"""
 @inline function uniquexy(x:: AbstractArray, y:: AbstractArray)
     @inbounds begin
         idx = unique(z -> x[z], 1:length(x))
@@ -155,6 +164,9 @@ end
     end
 end
 
+"""
+Merges two pairs of arrays x, y into a combined and sorted (along x-values) array pair.
+"""
 @inline function mergexy(x1:: AbstractArray, y1:: AbstractArray,
         x2:: AbstractArray, y2:: AbstractArray)
     @inbounds begin
@@ -169,8 +181,8 @@ end
     drop_duplicates(c1:: Curve)
 
 Removes duplicate x values from the curve.
-Note that it is not checked if the corresponding y values are identical,
-just an arbitrary one is kept.
+
+Note that it is not checked if the corresponding y values are identical, just an arbitrary one is kept.
 """
 function drop_duplicates(c1:: Curve)
     x, y = uniquexy(c1.x, c1.y)
@@ -180,8 +192,10 @@ end
 """
     concat(c1:: Curve, c2:: Curve; drop_dup=true)
 
-Merges 2 curves.
+Merges two curves.
+
 Element type is inferred by promotion, interpolation type is taken from 1st curve argument.
+Dulicate points are dropped by default, unless ˋdrop_dup=falseˋ is set.
 """
 function concat(c1:: Curve, c2:: Curve; drop_dup=true)
     x_all, y_all = mergexy(c1.x, c1.y, c2.x, c2.y)
