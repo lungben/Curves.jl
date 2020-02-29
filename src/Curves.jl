@@ -7,7 +7,7 @@ using Interpolations
 # Basic definition
 abstract type AbstractCurve end
 
-struct Curve{Tx <: AbstractArray, Ty <: AbstractArray{<: Number},
+struct Curve{Tx <: AbstractArray, Ty <: AbstractArray,
         Titp <: Interpolations.AbstractInterpolation} <: AbstractCurve
     "data points x-axis"
     x:: Tx
