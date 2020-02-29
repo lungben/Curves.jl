@@ -145,7 +145,7 @@ for op in operations
 end
 
 # Define operations where Curve is the only argument
-operations = (:exp, :log)
+operations = (:exp, :log, :sin, :cos, :tan)
 for op in operations
     @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
 end
