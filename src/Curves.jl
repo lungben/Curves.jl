@@ -120,7 +120,7 @@ interpolate(c0:: Curve, c1:: Curve):: Curve = interpolate(c0.x, c1)
 
 # Basic operations
 
-import Base: +, -, *, /, ^, exp, log, length, ==, ≈
+import Base: +, -, *, /, ^, exp, log, sin, cos, tan, length, ==, ≈
 
 length(c1:: Curve):: Int = length(c1.y)
 
