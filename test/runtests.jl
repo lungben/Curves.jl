@@ -1,6 +1,5 @@
 using Curves
 using Test
-using Interpolations
 
 @testset "Curves.jl" begin
     x1 = [3, 9, 18, 30, 91]
@@ -64,13 +63,15 @@ using Interpolations
     @test res.x == c1.x && res.y == c1.y .+ 2.0 .* c1.x
     
     # test non-standard interpolators
-    c_const = Curve(x1, y1, method=Gridded(Constant()))
+    c_const = Curve(x1, y1, method=ItpConstant())
     @test interpolate(28, c_const) == 1.81
     
     # test extrapolations
     @test interpolate(1, c1) == 1.01 # constant extrapolation
     c_42 = Curve(x1, y1, extrapolation=42)
     @test interpolate(1042, c_42) == 42
+    c_line = Curve(x1, y1, extrapolation=EtpLine())
+    @test interpolate(102, c_line) > 0 # just smoke test
 
     # Test use case in Readme
     # construct zero interest rate curve
