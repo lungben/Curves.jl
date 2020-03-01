@@ -62,18 +62,18 @@ Note that for method ˋGridded(x)ˋ must be used so that the x-grid can be non-u
 
 Valid choices for ˋmethodˋ are:
 
-* ˋGridded(Linear())ˋ - default
-* ˋGridded(Constant())ˋ
+* ˋItpLinear()ˋ, corresponds to Interpolation.jl ˋGridded(Linear())ˋ - default
+* ˋItpConstant()ˋ, corresponds to Interpolation.jl ˋGridded(Constant())ˋ
 
 Valid choices for ˋextrapolationˋ are:
 
-* ˋThrow()ˋ
-* ˋFlat()ˋ - default
-* ˋLine()ˋ
+* ˋEtpThrow()ˋ, corresponds to Interpolation.jl ˋThrow()ˋ
+* ˋEtpFlat()ˋ, corresponds to Interpolation.jl ˋFlat()ˋ - default
+* ˋEtpLine()ˋ, corresponds to Interpolation.jl ˋLine()ˋ
 * a constant value, which is used for filling-
 
 """
-Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false) =
+Curve(x, y; method=ItpLinear(), extrapolation=EtpFlat(), logx=false, logy=false) =
     Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
 
 "helper function to get Interpolations.jl interpolation method"
