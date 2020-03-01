@@ -1,6 +1,7 @@
 module Curves
 
 export Curve, interpolate, apply, concat, drop_duplicates
+export ItpLinear, ItpConstant, EtpThrow, EtpFlat, EtpLine # type constants referring to Interpolations.jl
 
 using Interpolations
 
@@ -19,6 +20,15 @@ the log values of the original array and stored in the interpolation object. Thi
 allows quick access to both the axis values (via curve.x and curve.y) and interpolated values.
 Note that Interpolation.jl does not support log-interpolation (yet?), therefore it needs to be implemented here explicitly.
 =#
+
+# Type constants referring to Interpolations.jl
+
+const ItpLinear = Gridded ∘ Linear
+const ItpConstant = Gridded ∘ Constant
+
+const EtpThrow = Throw
+const EtpFlat = Flat
+const EtpLine = Line
 
 # Basic definition
 abstract type AbstractCurve end
