@@ -20,8 +20,7 @@ Operations between 2 Curve objects (noted as `c1` and `c2`) are defined as follo
 4. Combine the results of both interpolations and create a new Curve object for the result.
 
 Technically, this package is based on [Interpolations.jl](https://github.com/JuliaMath/Interpolations.jl).
-
-Linear, Quadratic and Cubic Spline interpolation is supported by [Interpolations.jl](https://github.com/JuliaMath/Interpolations.jl). Support of log-interpolation on both axis is added by this package.
+Support of log-interpolation on both axis is added by this package.
 
 `Curve` objects are defined to be immutable, thus every operation creates a new `Curve` object as output.
 
