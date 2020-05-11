@@ -3,6 +3,8 @@ module Curves
 export Curve, interpolate, apply, concat, drop_duplicates
 export ItpLinear, ItpConstant, EtpThrow, EtpFlat, EtpLine # type constants referring to Interpolations.jl
 
+export Tenor, get_days
+
 using Interpolations
 
 #=
@@ -16,10 +18,12 @@ case, the interpolation object contains a pointer to the same array, thus there 
 in memory. The arrays x and y are mainly kept directly in the Curve struct (and not only inside the interpolation object)
 to avoid problems with type inference.
 However, if log interpolation is activated for one axis, a second array is created for the axis containing
-the log values of the original array and stored in the interpolation object. This results in double memory usage, but 
+the log values of the original array and stored in the interpolation object. This results in double memory usage, but
 allows quick access to both the axis values (via curve.x and curve.y) and interpolated values.
 Note that Interpolation.jl does not support log-interpolation (yet?), therefore it needs to be implemented here explicitly.
 =#
+
+include("tenors.jl")
 
 # Type constants referring to Interpolations.jl
 
@@ -51,7 +55,7 @@ end
     Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false)
 
 Standard curve constructor.
-Creates the interpolation/extrapolation object of the curve instance. 
+Creates the interpolation/extrapolation object of the curve instance.
 Interpolation/extrapolation details can be changed using the keyword arguments, defaults are:
 
 * linear interpolation
@@ -91,6 +95,20 @@ The interpolation / extrapolation parameters can be changed.
 Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) =
     Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
 
+"""
+    Curve(x:: AbstractVector{<: AbstractString}, y; kwargs...)
+
+Construct Curve objects from an array of tenor strings as x-axis.
+"""
+Curve(x:: AbstractVector{<: AbstractString}, y; kwargs...) = Curve(Tenor.(x), y; kwargs...)
+
+"""
+    Curve(x:: AbstractVector{Tenor}, y; kwargs...)
+
+Construct Curve objects from an array of Tenor objects strings as x-axis.
+"""
+Curve(x:: AbstractVector{Tenor}, y; kwargs...) = Curve(get_days.(x), y; kwargs...)
+
 Base.Broadcast.broadcastable(q:: Curve) = Ref(q) # treat it as a scalar in broadcasting
 
 # Interpolation
@@ -106,6 +124,10 @@ function interpolate(xval:: Real, c1:: Curve)
     c1.logy ? exp(c) : c
 end
 
+interpolate(xval:: Tenor, c1:: Curve) = interpolate(get_days(xval), c1)
+
+interpolate(xval:: AbstractString, c1:: Curve) = interpolate(Tenor(xval), c1)
+
 """
     interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve
 
@@ -120,7 +142,7 @@ interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve =
 """
     interpolate(c0:: Curve, c1:: Curve):: Curve
 
-Interpolates the Curve ˋc1ˋ on the x-axis points of the Curve ˋc0ˋ and returns a new Curve instance on the interpolated 
+Interpolates the Curve ˋc1ˋ on the x-axis points of the Curve ˋc0ˋ and returns a new Curve instance on the interpolated
 points.
 
 The resulting curve instance uses the same interpolation and extrapolation settings as ˋc1ˋ.
