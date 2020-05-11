@@ -24,6 +24,27 @@ Support of log-interpolation on both axis is added by this package.
 
 `Curve` objects are defined to be immutable, thus every operation creates a new `Curve` object as output.
 
+## Tenors
+
+In financial use cases, the x-axis of curves is often given in maturity tenors, e.g. 1W or 3M.
+The `Tenor` type is introduced to support such a notation for the x-axis of curves.
+
+Example:
+
+```julia
+t = Tenor.(("1D", "3W", "1M", "10y", "12m"))
+@assert t == (Tenor(Curves.TDays, 1), Tenor(Curves.TWeeks, 3), Tenor(Curves.TMonths, 1),
+    Tenor(Curves.TYears, 10), Tenor(Curves.TYears, 1))
+```
+Note that the tenor `12M` is automatically converted to `1Y` to avoid ambiguities.
+
+Tenors can be directly used in Curves:
+
+```julia
+curve_from_tenors = Curve(["1D", "3W", "1M", "10y"], [0.5, 0.7, 0.75, 0.83])
+val = interpolate("1W", curve_from_tenors)
+```
+
 ### Use Case
 
 The use case I had in mind was interest rate / FX curves for mathematical finance applications.
@@ -33,7 +54,7 @@ Example:
 
 ```julia
 # construct zero interest rate curve
-c_zero_base = Curve([2, 7, 30, 90, 180, 365], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
+c_zero_base = Curve(["2D", "1w", "1M", "3M", "6M", "12M"], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
 
 # define zero rate shifts (e.g. for stress testing or sensitivities)
 c_shifts = Curve([2, 185, 360], [0.1, -0.1, 0.2])
