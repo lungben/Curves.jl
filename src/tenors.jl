@@ -48,3 +48,5 @@ The days are calculated in a simplified way, assuming 30 days/ month and
 365 days/ year.
 """
 get_days(x:: Tenor):: Int = TenorInDays[x.unit]*x.multiplier
+
+Base.Broadcast.broadcastable(q:: Tenor) = Ref(q) # treat it as a scalar in broadcasting
