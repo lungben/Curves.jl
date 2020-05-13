@@ -6,6 +6,7 @@ using Test
         x1 = [3, 9, 18, 30, 91]
         y1 = [1.01, 1.204, 1.54, 1.81, 2.12]
         c1 = Curve(x1, y1)
+
         x2 = [5, 12, 18, 30, 125, 291]
         y2 = [1.01, 1.204, 1.54, 1.81, 2.12, 7.436]
         clog = Curve(x2, y2, logx=true, logy=true)
@@ -19,6 +20,14 @@ using Test
         @test !(c1 == c3)
         @test !(c1 ≈ c3)
 
+        # min/max
+
+        @test minimum(c1, dims=1) == 3
+        @test minimum(c1, dims=2) == 1.01
+        @test maximum(c1, dims=1) == 91
+        @test maximum(c1, dims=2) == 2.12
+        @test_throws ErrorException minimum(c1, dims=3)
+        @test_throws ErrorException maximum(c1, dims=0)
 
         # Interpolation
         @test interpolate(5.5, c1) ≈ (1.204-1.01)/(9-3)*(5.5-3)+1.01
@@ -62,6 +71,7 @@ using Test
         @test res.x == 3c1.x && res.y == c1.y
         res = apply((x, y) -> 2x+y, c1, axis=:xy)
         @test res.x == c1.x && res.y == c1.y .+ 2.0 .* c1.x
+        @test_throws ErrorException apply(x -> 2x, c1, axis=:z)
 
         # test non-standard interpolators
         c_const = Curve(x1, y1, method=ItpConstant())

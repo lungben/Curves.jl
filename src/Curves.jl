@@ -181,6 +181,39 @@ for op in operations
     @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
 end
 
+# minimum and maximum functions
+import Base: minimum, maximum
+
+"""
+    minimum(c1:: Curve; dims=1)
+
+Returns the minimum of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
+"""
+function minimum(c1:: Curve; dims=1)
+    if dims == 1
+        return c1.x[begin]
+    elseif dims == 2
+        return c1.y[begin]
+    else
+        error("invalid dimension for Curve objects, only 1 and 2 supported")
+    end
+end
+
+"""
+    maximum(c1:: Curve; dims=1)
+
+Returns the maximum of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
+"""
+function maximum(c1:: Curve; dims=1)
+    if dims == 1
+        return c1.x[end]
+    elseif dims == 2
+        return c1.y[end]
+    else
+        error("invalid dimension for Curve objects, only 1 and 2 supported")
+    end
+end
+
 # Helper functions for concatination
 
 """
