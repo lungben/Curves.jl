@@ -50,3 +50,11 @@ The days are calculated in a simplified way, assuming 30 days/ month and
 get_days(x:: Tenor):: Int = TenorInDays[x.unit]*x.multiplier
 
 Base.Broadcast.broadcastable(q:: Tenor) = Ref(q) # treat it as a scalar in broadcasting
+
+Base.isless(x:: Tenor, y:: Tenor) = isless(get_days(x), get_days(y))
+Base.isless(x:: Tenor, y:: AbstractString) = isless(x, Tenor(y))
+Base.isless(x:: AbstractString, y:: Tenor) = isless(Tenor(x), y)
+
+import Base: ==
+==(x:: Tenor, y:: AbstractString) = ==(x, Tenor(y))
+==(x:: AbstractString, y:: Tenor) = ==(Tenor(x), y)

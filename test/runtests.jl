@@ -96,6 +96,14 @@ using Test
         @test Tenor("12M") == Tenor("1y") == Tenor(Curves.TYears, 1)
         @test Tenor("48m") == Tenor("4Y") == Tenor(Curves.TYears, 4)
 
+        t1 = Tenor("1M")
+        t2 = Tenor("2M")
+        @test t1 < t2
+        @test t1 > "1W"
+        @test "6W" < t2
+        @test "2M" == t2
+        @test t1 == "1M"
+
         # construct Curve objects from tenors
         ct = Curve(["1D", "3W", "1M", "10y"], [0.5, 0.7, 0.75, 0.83])
         ct2 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83])
