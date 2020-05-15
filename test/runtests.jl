@@ -12,6 +12,8 @@ using Test
         clog = Curve(x2, y2, logx=true, logy=true)
         clogy = Curve(x1, y1, logy=true)
 
+        c0 = Curve([3], [5.5]) # curve with single point
+
         # equality
         c2 = Curve(c1)
         c3 = Curve(c1, logx=true)
@@ -19,6 +21,9 @@ using Test
         @test c1 ≈ c2
         @test !(c1 == c3)
         @test !(c1 ≈ c3)
+        @test !(c0 == c1)
+        @test c0 == Curve(3, 5.5)
+        @test Curve(Tenor("3D"), 7.8) == Curve([3], [7.8])
 
         # first / last
         @test firstpoint(c1, dims=1) == 3
@@ -27,17 +32,20 @@ using Test
         @test lastpoint(c1, dims=2) == 2.12
         @test_throws ErrorException firstpoint(c1, dims=3)
         @test_throws ErrorException lastpoint(c1, dims=0)
+        @test firstpoint(c0) == lastpoint(c0) == 3
 
         @test first(c1, 3) == Curve([3, 9, 18], [1.01, 1.204, 1.54])
         @test last(c1, 4) == Curve([9, 18, 30, 91], [1.204, 1.54, 1.81, 2.12])
         @test first(c1, 10) == c1
         @test last(c1, 100) == c1
-        @test_throws ErrorException first(c1, 1)
+        @test_throws ErrorException first(c1, 0)
         @test_throws ErrorException last(c1, -1)
+        @test first(c0, 10) == last(c0, 10) == c0
 
         @test filter((x) -> x > 10, c1) == Curve([18, 30, 91], [1.54, 1.81, 2.12])
         @test filter((x) -> x < 2, c1, axis=:y) == Curve([3, 9, 18, 30], [1.01, 1.204, 1.54, 1.81])
-
+        @test filter((x) -> x > 2, c0) == c0
+        @test_throws ErrorException filter((x) -> x > 10, c0)
 
         # Interpolation
         @test interpolate(5.5, c1) ≈ (1.204-1.01)/(9-3)*(5.5-3)+1.01
@@ -49,6 +57,8 @@ using Test
         @test c_log_int isa Curve && length(c_log_int) == 5 && c_log_int.logx==true && c_log_int.logy==true
         @test interpolate(5.5, clogy) ≈ exp((log(1.204)-log(1.01))/(9-3)*(5.5-3)+log(1.01))
         @test interpolate(c1, clog) isa Curve
+
+        @test interpolate(10, c0) == 5.5
 
         # Operations with Scalars
         @test (c1 + 2).y == y1 .+ 2 && (c1 + 2).x == x1
