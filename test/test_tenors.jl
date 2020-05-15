@@ -23,3 +23,9 @@ ct2 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83])
 
 @test interpolate("1W", ct) ≈ (0.7 - 0.5)/(21 - 1)*(7 - 1) + 0.5
 @test interpolate(Tenor("12m"), ct) == interpolate("1Y", ct)
+
+@test get_tenor(12) == Tenor("12D")
+@test get_tenor(21) == Tenor("3W")
+@test get_tenor(60) == Tenor("2M")
+@test get_tenor(365) == Tenor("1y")
+@test_throws ErrorException get_tenor(-1)

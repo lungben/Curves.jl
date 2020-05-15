@@ -39,6 +39,10 @@ function Tenor(x:: AbstractString)
 end
 
 const TenorInDays = Dict(TDays => 1, TWeeks => 7, TMonths => 30, TYears => 365)
+# sorting of a Dict is not deterministic
+const TenorSorting = sortperm(collect(keys(Curves.TenorInDays)), rev=true)
+const Tenors = collect(keys(TenorInDays))[TenorSorting]
+const TenorDays = collect(values(TenorInDays))[TenorSorting]
 
 """
     get_days(x:: Tenor):: Int
@@ -48,6 +52,24 @@ The days are calculated in a simplified way, assuming 30 days/ month and
 365 days/ year.
 """
 get_days(x:: Tenor):: Int = TenorInDays[x.unit]*x.multiplier
+
+"""
+    get_tenor(x:: Integer):: Tenor
+
+Converts the given number of days to a Tenor.
+
+The following mapping is used (exactly the reverse of `get_days`):
+TDays => 1, TWeeks => 7, TMonths => 30, TYears => 365
+"""
+function get_tenor(x:: Integer):: Tenor
+    x > 0 || error("number of days must be positive, obtained $x")
+    for (i, unit_days) in enumerate(TenorDays)
+        if x % unit_days == 0
+            return Tenor(Tenors[i], x ÷ unit_days)
+        end
+    end
+    error("could not convert days $x to tenor")
+end
 
 Base.Broadcast.broadcastable(q:: Tenor) = Ref(q) # treat it as a scalar in broadcasting
 
