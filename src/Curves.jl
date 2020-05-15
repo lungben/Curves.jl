@@ -181,15 +181,15 @@ for op in operations
     @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
 end
 
-# minimum and maximum functions
-import Base: minimum, maximum
+# first and last point functions
+import Base: first, last
 
 """
-    minimum(c1:: Curve; dims=1)
+    first(c1:: Curve; dims=1)
 
-Returns the minimum of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
+Returns the first point of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
 """
-function minimum(c1:: Curve; dims=1)
+function first(c1:: Curve; dims=1)
     if dims == 1
         return c1.x[begin]
     elseif dims == 2
@@ -200,11 +200,11 @@ function minimum(c1:: Curve; dims=1)
 end
 
 """
-    maximum(c1:: Curve; dims=1)
+    last(c1:: Curve; dims=1)
 
-Returns the maximum of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
+Returns the last point of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
 """
-function maximum(c1:: Curve; dims=1)
+function last(c1:: Curve; dims=1)
     if dims == 1
         return c1.x[end]
     elseif dims == 2
