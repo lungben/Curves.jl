@@ -20,6 +20,8 @@ c3 = Curve(c1, logx=true)
 @test c0 == Curve(3, 5.5)
 @test Curve(Tenor("3D"), 7.8) == Curve([3], [7.8])
 
+@test Curve(reverse(x1), reverse(y1)) == c1
+
 # first / last
 @test firstpoint(c1, dims=1) == 3
 @test firstpoint(c1, dims=2) == 1.01

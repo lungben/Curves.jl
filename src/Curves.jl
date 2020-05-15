@@ -55,6 +55,8 @@ end
 
 Standard curve constructor.
 Creates the interpolation/extrapolation object of the curve instance.
+The points `x` and `y` do not need to be sorted, this is done in the Curve constructor.
+
 Interpolation/extrapolation details can be changed using the keyword arguments, defaults are:
 
 * linear interpolation
@@ -80,7 +82,9 @@ function Curve(x, y; method=ItpLinear(), extrapolation=EtpFlat(), logx=false, lo
     if length(x) == 1
         return Curve(x, y, nothing, logx, logy)
     else
-        issorted(x) || error("x-axis must be sorted")
+        perm = sortperm(x)
+        x = x[perm]
+        y = y[perm]
         return Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
     end
 end
