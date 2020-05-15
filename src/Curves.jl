@@ -1,6 +1,6 @@
 module Curves
 
-export Curve, interpolate, apply, concat, drop_duplicates
+export Curve, interpolate, apply, concat, drop_duplicates, firstpoint, lastpoint
 export ItpLinear, ItpConstant, EtpThrow, EtpFlat, EtpLine # type constants referring to Interpolations.jl
 
 export Tenor, get_days
@@ -182,14 +182,13 @@ for op in operations
 end
 
 # first and last point functions
-import Base: first, last
 
 """
-    first(c1:: Curve; dims=1)
+    firstpoint(c1:: Curve; dims=1):: Real
 
 Returns the first point of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
 """
-function first(c1:: Curve; dims=1)
+function firstpoint(c1:: Curve; dims=1):: Real
     if dims == 1
         return c1.x[begin]
     elseif dims == 2
@@ -200,11 +199,11 @@ function first(c1:: Curve; dims=1)
 end
 
 """
-    last(c1:: Curve; dims=1)
+    lastpoint(c1:: Curve; dims=1):: Real
 
 Returns the last point of the X-axis (if `dims=1`) or the Y-axis (if `dims=2`).
 """
-function last(c1:: Curve; dims=1)
+function lastpoint(c1:: Curve; dims=1):: Real
     if dims == 1
         return c1.x[end]
     elseif dims == 2
@@ -212,6 +211,32 @@ function last(c1:: Curve; dims=1)
     else
         error("invalid dimension for Curve objects, only 1 and 2 supported")
     end
+end
+
+import Base: first, last
+
+"""
+    first(c1:: Curve, n:: Integer)
+
+Returns a new curve containing the first n points of the previous curve.
+`n` must be at least 2.
+"""
+function first(c1:: Curve, n:: Integer)
+    n < 2 && error("`n` must be at least 2 for definition of a curve")
+    n = min(n, length(c1))
+    Curve(c1.x[begin:n], c1.y[begin:n], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+end
+
+"""
+    last(c1:: Curve, n:: Integer)
+
+Returns a new curve containing the last n points of the previous curve.
+`n` must be at least 2.
+"""
+function last(c1:: Curve, n:: Integer)
+    n < 2 && error("`n` must be at least 2 for definition of a curve")
+    n = min(n, length(c1))
+    Curve(c1.x[end-n+1:end], c1.y[end-n+1:end], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
 end
 
 # Helper functions for concatination

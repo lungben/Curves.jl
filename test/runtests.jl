@@ -20,14 +20,21 @@ using Test
         @test !(c1 == c3)
         @test !(c1 ≈ c3)
 
-        # min/max
+        # first / last
+        @test firstpoint(c1, dims=1) == 3
+        @test firstpoint(c1, dims=2) == 1.01
+        @test lastpoint(c1, dims=1) == 91
+        @test lastpoint(c1, dims=2) == 2.12
+        @test_throws ErrorException firstpoint(c1, dims=3)
+        @test_throws ErrorException lastpoint(c1, dims=0)
 
-        @test first(c1, dims=1) == 3
-        @test first(c1, dims=2) == 1.01
-        @test last(c1, dims=1) == 91
-        @test last(c1, dims=2) == 2.12
-        @test_throws ErrorException first(c1, dims=3)
-        @test_throws ErrorException last(c1, dims=0)
+        @test first(c1, 3) == Curve([3, 9, 18], [1.01, 1.204, 1.54])
+        @test last(c1, 4) == Curve([9, 18, 30, 91], [1.204, 1.54, 1.81, 2.12])
+        @test first(c1, 10) == c1
+        @test last(c1, 100) == c1
+        @test_throws ErrorException first(c1, 1)
+        @test_throws ErrorException last(c1, -1)
+
 
         # Interpolation
         @test interpolate(5.5, c1) ≈ (1.204-1.01)/(9-3)*(5.5-3)+1.01
