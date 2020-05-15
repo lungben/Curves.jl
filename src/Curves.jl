@@ -213,7 +213,7 @@ function lastpoint(c1:: Curve; dims=1):: Real
     end
 end
 
-import Base: first, last
+import Base: first, last, filter
 
 """
     first(c1:: Curve, n:: Integer)
@@ -237,6 +237,23 @@ function last(c1:: Curve, n:: Integer)
     n < 2 && error("`n` must be at least 2 for definition of a curve")
     n = min(n, length(c1))
     Curve(c1.x[end-n+1:end], c1.y[end-n+1:end], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+end
+
+"""
+    filter(f:: Function, c1::Curve; axis:: Symbol = :x)
+
+
+"""
+function filter(f:: Function, c1::Curve; axis:: Symbol = :x)
+    if axis==:x
+        mask = f.(c1.x)
+    elseif axis==:y
+        mask = f.(c1.y)
+    else
+        error("axis must be :x or :y, the value $axis is not allowed")
+    end
+    count(mask) < 2 && error("less than 2 points remaining")
+    Curve(c1.x[mask], c1.y[mask], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
 end
 
 # Helper functions for concatination

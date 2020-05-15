@@ -35,6 +35,9 @@ using Test
         @test_throws ErrorException first(c1, 1)
         @test_throws ErrorException last(c1, -1)
 
+        @test filter((x) -> x > 10, c1) == Curve([18, 30, 91], [1.54, 1.81, 2.12])
+        @test filter((x) -> x < 2, c1, axis=:y) == Curve([3, 9, 18, 30], [1.01, 1.204, 1.54, 1.81])
+
 
         # Interpolation
         @test interpolate(5.5, c1) ≈ (1.204-1.01)/(9-3)*(5.5-3)+1.01
