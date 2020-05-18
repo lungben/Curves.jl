@@ -74,9 +74,14 @@ end
 Base.Broadcast.broadcastable(q:: Tenor) = Ref(q) # treat it as a scalar in broadcasting
 
 Base.isless(x:: Tenor, y:: Tenor) = isless(get_days(x), get_days(y))
+
 Base.isless(x:: Tenor, y:: AbstractString) = isless(x, Tenor(y))
+Base.isless(x:: Tenor, y:: Integer) = isless(get_days(x), y)
 Base.isless(x:: AbstractString, y:: Tenor) = isless(Tenor(x), y)
+Base.isless(x:: Integer, y:: Tenor) = isless(x, get_days(y))
 
 import Base: ==
+==(x:: Tenor, y:: Tenor) = x.unit == y.unit && x.multiplier == y.multiplier
 ==(x:: Tenor, y:: AbstractString) = ==(x, Tenor(y))
-==(x:: AbstractString, y:: Tenor) = ==(Tenor(x), y)
+==(x:: Tenor, y:: Integer) = ==(get_days(x), y)
+==(x, y:: Tenor) = ==(y, x)
