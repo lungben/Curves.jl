@@ -199,8 +199,12 @@ function concat(c1:: Curve, c2:: Curve; drop_dup=true)
     if drop_dup
         x_all, y_all = uniquexy(x_all, y_all)
     end
-    Curve(x_all, y_all, method=getitpm(c1), logx=c1.logx, logy=c1.logy,
-        extrapolation=getetpm(c1))
+    if isnothing(c1.etp)
+        return Curve(x_all, y_all)
+    else
+        return Curve(x_all, y_all, method=getitpm(c1), logx=c1.logx, logy=c1.logy,
+            extrapolation=getetpm(c1))
+    end
 end
 
 concat(c1:: Curve, cx:: Curve...) = concat(c1, concat(cx[begin], cx[begin+1:end]...))

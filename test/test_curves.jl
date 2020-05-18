@@ -71,6 +71,7 @@ c_add = +(c1, 2, logy=true)
 c1d = Curve([1, 3, 3, 7, 9], [2, 4, 4, 8, 10])
 @test drop_duplicates(c1d).x == [1, 3, 7, 9]
 @test concat(c1, c1d).x == [1, 3, 7, 9, 18, 30, 91]
+@test concat(Curve(5.5, 42.1), c1) == Curve([3, 5.5, 9, 18, 30, 91], [1.01, 42.1, 1.204, 1.54, 1.81, 2.12])
 
 # Operations on Curves
 c_sum = c1+c1d
