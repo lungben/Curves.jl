@@ -12,6 +12,10 @@ t1 = Tenor("1M")
 t2 = Tenor("2M")
 @test t1 < t2
 @test t1 > "1W"
+@test t1 > 28
+@test 32 > t1
+@test t1 == 30
+@test !(31 == t1)
 @test "6W" < t2
 @test "2M" == t2
 @test t1 == "1M"
