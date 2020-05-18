@@ -203,6 +203,8 @@ function concat(c1:: Curve, c2:: Curve; drop_dup=true)
         extrapolation=getetpm(c1))
 end
 
+concat(c1:: Curve, cx:: Curve...) = concat(c1, concat(cx[begin], cx[begin+1:end]...))
+
 # Operations with Multiple Curves
 
 operations = (:+, :-, :*, :/, :^)
