@@ -20,25 +20,25 @@ interpolate(xval:: Tenor, c1:: Curve) = interpolate(get_days(xval), c1)
 interpolate(xval:: AbstractString, c1:: Curve) = interpolate(Tenor(xval), c1)
 
 """
-    interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve
+    interpolate(xval:: AbstractArray{T} where T, c1:: Curve; kwargs...):: Curve
 
 Interpolates the curve onto the given array and returns a new Curve instance on the interpolated points.
 
-The resulting curve instance uses the same interpolation and extrapolation settings as the original one.
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-interpolate(xval:: AbstractArray{T} where T, c1:: Curve):: Curve =
-    Curve(xval, interpolate.(xval, c1), method=getitpm(c1), logx=c1.logx, logy=c1.logy,
-        extrapolation=getetpm(c1))
+interpolate(xval:: AbstractArray{T} where T, c1:: Curve; kwargs...):: Curve = Curve(xval, interpolate.(xval, c1); kwargs...)
 
 """
-    interpolate(c0:: Curve, c1:: Curve):: Curve
+    interpolate(c0:: Curve, c1:: Curve; kwargs...):: Curve
 
 Interpolates the Curve ˋc1ˋ on the x-axis points of the Curve ˋc0ˋ and returns a new Curve instance on the interpolated
 points.
 
-The resulting curve instance uses the same interpolation and extrapolation settings as ˋc1ˋ.
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-interpolate(c0:: Curve, c1:: Curve):: Curve = interpolate(c0.x, c1)
+interpolate(c0:: Curve, c1:: Curve; kwargs...):: Curve = interpolate(c0.x, c1; kwargs...)
 
 # Basic operations
 
@@ -107,35 +107,44 @@ end
 import Base: first, last, filter
 
 """
-    first(c1:: Curve, n:: Integer)
+    first(c1:: Curve, n:: Integer; kwargs...)
 
 Returns a new curve containing the first n points of the previous curve.
 `n` must be at least 1.
+
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-function first(c1:: Curve, n:: Integer)
+function first(c1:: Curve, n:: Integer; kwargs...)
     n < 1 && error("`n` must be at least 1 for definition of a curve")
     n = min(n, length(c1))
-    Curve(c1.x[begin:n], c1.y[begin:n], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    Curve(c1.x[begin:n], c1.y[begin:n]; kwargs...)
 end
 
 """
-    last(c1:: Curve, n:: Integer)
+    last(c1:: Curve, n:: Integer; kwargs...)
 
 Returns a new curve containing the last n points of the previous curve.
 `n` must be at least 1.
+
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-function last(c1:: Curve, n:: Integer)
+function last(c1:: Curve, n:: Integer; kwargs...)
     n < 1 && error("`n` must be at least 2 for definition of a curve")
     n = min(n, length(c1))
-    Curve(c1.x[end-n+1:end], c1.y[end-n+1:end], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    Curve(c1.x[end-n+1:end], c1.y[end-n+1:end]; kwargs...)
 end
 
 """
-    filter(f:: Function, c1::Curve; axis:: Symbol = :x)
+    filter(f:: Function, c1::Curve; axis:: Symbol = :x, kwargs...)
 
+Filters curve points according to the given (boolean return) function.
 
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-function filter(f:: Function, c1::Curve; axis:: Symbol = :x)
+function filter(f:: Function, c1::Curve; axis:: Symbol = :x, kwargs...)
     if axis==:x
         mask = f.(c1.x)
     elseif axis==:y
@@ -144,7 +153,7 @@ function filter(f:: Function, c1::Curve; axis:: Symbol = :x)
         error("axis must be :x or :y, the value $axis is not allowed")
     end
     count(mask) < 1 && error("less than 1 point remaining")
-    Curve(c1.x[mask], c1.y[mask], method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    Curve(c1.x[mask], c1.y[mask]; kwargs...)
 end
 
 # Helper functions for concatination
@@ -180,6 +189,8 @@ end
 Removes duplicate x values from the curve.
 
 Note that it is not checked if the corresponding y values are identical, just an arbitrary one is kept.
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
 function drop_duplicates(c1:: Curve)
     x, y = uniquexy(c1.x, c1.y)
@@ -187,24 +198,20 @@ function drop_duplicates(c1:: Curve)
 end
 
 """
-    concat(c1:: Curve, c2:: Curve; drop_dup=true)
+    concat(c1:: Curve, c2:: Curve; drop_dup=true, kwargs...)
 
 Merges two curves.
 
-Element type is inferred by promotion, interpolation type is taken from 1st curve argument.
-Dulicate points are dropped by default, unless ˋdrop_dup=falseˋ is set.
+Element type is inferred by promotion. Dulicate points are dropped by default, unless ˋdrop_dup=falseˋ is set.
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+using the ˋkwargs...ˋ
 """
-function concat(c1:: Curve, c2:: Curve; drop_dup=true)
+function concat(c1:: Curve, c2:: Curve; drop_dup=true, kwargs...)
     x_all, y_all = mergexy(c1.x, c1.y, c2.x, c2.y)
     if drop_dup
         x_all, y_all = uniquexy(x_all, y_all)
     end
-    if isnothing(c1.etp)
-        return Curve(x_all, y_all)
-    else
-        return Curve(x_all, y_all, method=getitpm(c1), logx=c1.logx, logy=c1.logy,
-            extrapolation=getetpm(c1))
-    end
+    return Curve(x_all, y_all; kwargs...)
 end
 
 concat(c1:: Curve, cx:: Curve...) = concat(c1, concat(cx[begin], cx[begin+1:end]...))
@@ -236,7 +243,7 @@ If ˋaxisˋ is ˋ:xyˋ (default): applies a 2-argument function ˋf(x,y)=zˋ to 
 
 If ˋaxisˋ is ˋ:xˋ or ˋ:yˋ: applies a 1-argument function ˋf(x)=zˋ to a single axis of the Curve.
 
-Thw output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
+The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
 using the ˋkwargs...ˋ
 """
 function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, kwargs...)

@@ -51,7 +51,7 @@ c_int = interpolate([3, 9, 14, 31, 33], c1)
 
 @test interpolate(25, clog) ≈ exp((log(1.81)-log(1.54))/(log(30)-log(18))*(log(25)-log(18))+log(1.54))
 c_log_int = interpolate([3, 9, 14, 31, 33], clog)
-@test c_log_int isa Curve && length(c_log_int) == 5 && c_log_int.logx==true && c_log_int.logy==true
+@test c_log_int isa Curve && length(c_log_int) == 5
 @test interpolate(5.5, clogy) ≈ exp((log(1.204)-log(1.01))/(9-3)*(5.5-3)+log(1.01))
 @test interpolate(c1, clog) isa Curve
 
