@@ -36,7 +36,7 @@ const EtpLine = Line
 # Basic definition
 abstract type AbstractCurve end
 
-struct Curve{Tx <: AbstractArray, Ty <: AbstractArray,
+struct Curve{Tx <: AbstractVector, Ty <: AbstractVector,
         Titp <: Union{Interpolations.AbstractInterpolation, Nothing}} <: AbstractCurve
     "data points x-axis"
     x:: Tx
@@ -51,7 +51,7 @@ struct Curve{Tx <: AbstractArray, Ty <: AbstractArray,
 end
 
 """
-    Curve(x, y; method=Gridded(Linear()), extrapolation=Flat(), logx=false, logy=false)
+    Curve(x:: AbstractVector, y:: AbstractVector; method=ItpLinear(), extrapolation=EtpFlat(), logx=false, logy=false, sort=true)
 
 Standard curve constructor.
 Creates the interpolation/extrapolation object of the curve instance.
@@ -77,14 +77,17 @@ Valid choices for ˋextrapolationˋ are:
 
 If the curve consists only of a single point, always constant extrapolation is used.
 """
-function Curve(x, y; method=ItpLinear(), extrapolation=EtpFlat(), logx=false, logy=false)
+function Curve(x:: AbstractVector, y:: AbstractVector;
+        method=ItpLinear(), extrapolation=EtpFlat(), logx=false, logy=false, sort=true)
     length(x) == length(y) || error("length of x and y arrays must match")
     if length(x) == 1
         return Curve(x, y, nothing, logx, logy)
     else
-        perm = sortperm(x)
-        x = x[perm]
-        y = y[perm]
+        if sort
+            perm = sortperm(x)
+            x = x[perm]
+            y = y[perm]
+        end
         return Curve(x, y, extrapolate(interpolate(logx ? (log.(x),) : (x,), logy ?  log.(y) : y, method), extrapolation), logx, logy)
     end
 end
@@ -96,27 +99,27 @@ getitpm(c1:: Curve) = isnothing(c1.etp) ? nothing : c1.etp.itp.it
 getetpm(c1:: Curve) = isnothing(c1.etp) ? nothing : c1.etp.et
 
 """
-    Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy)
+    Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy, sort=true)
 
 Copy constructor to generate a new curve from an existing one.
 The interpolation / extrapolation parameters can be changed.
 """
-Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy) =
-    Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy)
+Curve(c1:: Curve; method=getitpm(c1), extrapolation=getetpm(c1), logx=c1.logx, logy=c1.logy, sort=true) =
+    Curve(c1.x, c1.y, method=method, extrapolation=extrapolation, logx=logx, logy=logy, sort=sort)
 
 """
     Curve(x:: AbstractVector{<: AbstractString}, y; kwargs...)
 
 Construct Curve objects from an array of tenor strings as x-axis.
 """
-Curve(x:: AbstractVector{<: AbstractString}, y; kwargs...) = Curve(Tenor.(x), y; kwargs...)
+Curve(x:: AbstractVector{<: AbstractString}, y:: AbstractVector; kwargs...) = Curve(Tenor.(x), y; kwargs...)
 
 """
-    Curve(x:: AbstractVector{Tenor}, y; kwargs...)
+    Curve(x:: AbstractVector{Tenor}, y:: AbstractVector; kwargs...)
 
 Construct Curve objects from an array of Tenor objects strings as x-axis.
 """
-Curve(x:: AbstractVector{Tenor}, y; kwargs...) = Curve(get_days.(x), y; kwargs...)
+Curve(x:: AbstractVector{Tenor}, y:: AbstractVector; kwargs...) = Curve(get_days.(x), y; kwargs...)
 
 Curve(x:: Real, y:: Real; kwargs...) = Curve([x], [y]; kwargs...)
 Curve(x:: Tenor, y:: Real; kwargs...) = Curve([get_days(x)], [y]; kwargs...)

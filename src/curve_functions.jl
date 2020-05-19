@@ -62,14 +62,14 @@ on potentially negative values.
 # Define operations with scalars
 operations = (:+, :-, :*, :/, :^)
 for op in operations
-    @eval $op(c1:: Curve, a:: Number; kwargs...) = Curve(c1.x, $op.(c1.y, a); kwargs...)
-    @eval $op(a:: Number, c1:: Curve; kwargs...) = Curve(c1.x, $op.(a, c1.y); kwargs...)
+    @eval $op(c1:: Curve, a:: Number; kwargs...) = Curve(c1.x, $op.(c1.y, a); sort=false, kwargs...)
+    @eval $op(a:: Number, c1:: Curve; kwargs...) = Curve(c1.x, $op.(a, c1.y); sort=false, kwargs...)
 end
 
 # Define operations where Curve is the only argument
 operations = (:exp, :log, :sin, :cos, :tan)
 for op in operations
-    @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); kwargs...)
+    @eval $op(c1:: Curve; kwargs...) = Curve(c1.x, $op.(c1.y); sort=false, kwargs...)
 end
 
 # first and last point functions
@@ -118,7 +118,7 @@ using the ˋkwargs...ˋ
 function first(c1:: Curve, n:: Integer; kwargs...)
     n < 1 && error("`n` must be at least 1 for definition of a curve")
     n = min(n, length(c1))
-    Curve(c1.x[begin:n], c1.y[begin:n]; kwargs...)
+    Curve(c1.x[begin:n], c1.y[begin:n]; sort=false, kwargs...)
 end
 
 """
@@ -131,9 +131,9 @@ The output Curve is constructed using default settings, alternative settings can
 using the ˋkwargs...ˋ
 """
 function last(c1:: Curve, n:: Integer; kwargs...)
-    n < 1 && error("`n` must be at least 2 for definition of a curve")
+    n < 1 && error("`n` must be at least 1 for definition of a curve")
     n = min(n, length(c1))
-    Curve(c1.x[end-n+1:end], c1.y[end-n+1:end]; kwargs...)
+    Curve(c1.x[end-n+1:end], c1.y[end-n+1:end]; sort=false, kwargs...)
 end
 
 """
@@ -153,7 +153,7 @@ function filter(f:: Function, c1::Curve; axis:: Symbol = :x, kwargs...)
         error("axis must be :x or :y, the value $axis is not allowed")
     end
     count(mask) < 1 && error("less than 1 point remaining")
-    Curve(c1.x[mask], c1.y[mask]; kwargs...)
+    Curve(c1.x[mask], c1.y[mask]; sort=false, kwargs...)
 end
 
 # Helper functions for concatination
@@ -171,17 +171,9 @@ Note that it does not check if the y-values for x-value duplicates are the same!
 end
 
 """
-Merges two pairs of arrays x, y into a combined and sorted (along x-values) array pair.
+Merges two pairs of arrays x, y into a combined (along x-values) array pair.
 """
-@inline function mergexy(x1:: AbstractArray, y1:: AbstractArray,
-        x2:: AbstractArray, y2:: AbstractArray)
-    @inbounds begin
-        x_all = vcat(x1, x2)
-        y_all = vcat(y1, y2)
-        perm = sortperm(x_all)
-        x_all[perm], y_all[perm]
-    end
-end
+mergexy(x1:: AbstractArray, y1:: AbstractArray, x2:: AbstractArray, y2:: AbstractArray) = vcat(x1, x2), vcat(y1, y2)
 
 """
     drop_duplicates(c1:: Curve)
@@ -194,7 +186,7 @@ using the ˋkwargs...ˋ
 """
 function drop_duplicates(c1:: Curve)
     x, y = uniquexy(c1.x, c1.y)
-    Curve(x, y, method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
+    Curve(x, y, sort=false, method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
 end
 
 """
@@ -211,7 +203,7 @@ function concat(c1:: Curve, c2:: Curve; drop_dup=true, kwargs...)
     if drop_dup
         x_all, y_all = uniquexy(x_all, y_all)
     end
-    return Curve(x_all, y_all; kwargs...)
+    return Curve(x_all, y_all; sort=true, kwargs...)
 end
 
 concat(c1:: Curve, cx:: Curve...) = concat(c1, concat(cx[begin], cx[begin+1:end]...))
@@ -230,7 +222,7 @@ for op in operations
             x, y = mergexy(c1.x, y_c1_grid, c2.x, y_c2_grid)
             x, y = uniquexy(x, y)
         end
-        Curve(x, y; kwargs...)
+        Curve(x, y; sort=true, kwargs...)
     end
 end
 
@@ -250,14 +242,16 @@ function apply(f:: Function, c1:: Curve; axis:: Symbol = :xy, kwargs...)
     if axis==:xy
         x = c1.x
         y = f.(c1.x, c1.y)
+        return Curve(x, y; sort=false, kwargs...)
     elseif axis==:x
         x = f.(c1.x)
         y = c1.y
+        return Curve(x, y; sort=true, kwargs...)
     elseif axis==:y
         x = c1.x
         y = f.(c1.y)
+        return Curve(x, y; sort=false, kwargs...)
     else
         error("axis must be :xy, :x or :y, the value $axis is not allowed")
     end
-    Curve(x, y; kwargs...)
 end
