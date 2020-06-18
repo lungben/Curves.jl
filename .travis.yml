@@ -2,4 +2,4 @@ codecov: true
 language: julia
 julia:
   - nightly
-  - 1.4.1
+  - 1.4
