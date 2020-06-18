@@ -101,3 +101,8 @@ c_42 = Curve(x1, y1, extrapolation=42)
 @test interpolate(1042, c_42) == 42
 c_line = Curve(x1, y1, extrapolation=EtpLine())
 @test interpolate(102, c_line) > 0 # just smoke test
+
+# test pretty printing
+io = IOBuffer(append=true)
+print(io, Curve([t"2D", t"1W", t"3M", t"6M", t"12M"], [0.8, 0.9, 1.1, 1.15, 1.2], logy=true))
+@test read(io, String) == "x = [2, 7, 90, 180, 365], y = [0.8, 0.9, 1.1, 1.15, 1.2], logx = false, logy = true"
