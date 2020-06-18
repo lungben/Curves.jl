@@ -45,6 +45,12 @@ curve_from_tenors = Curve(["1D", "3W", "1M", "10y"], [0.5, 0.7, 0.75, 0.83])
 val = interpolate("1W", curve_from_tenors)
 ```
 
+As a shortcut for creating tenor objects, a string macro is provided:
+
+```julia
+@assert t"1W" == Tenor("1W")
+```
+
 ### Use Case
 
 The use case I had in mind was interest rate / FX curves for mathematical finance applications.
