@@ -3,7 +3,7 @@ module Curves
 export Curve, interpolate, apply, concat, drop_duplicates, firstpoint, lastpoint
 export ItpLinear, ItpConstant, EtpFlat, EtpLine # type constants referring to Interpolations.jl
 
-export Tenor, get_days, get_tenor
+export Tenor, get_days, get_tenor, @t_str
 
 using Interpolations
 

@@ -38,6 +38,19 @@ function Tenor(x:: AbstractString)
     Tenor(unit, multiplier)
 end
 
+"""
+String macro for the creation of Tenor objects.
+
+Example:
+
+    julia> t"1W"
+    Tenor(Curves.TWeeks, 1)
+
+"""
+macro t_str(s)
+    esc(:(Tenor($s)))
+end
+
 const TenorInDays = Dict(TDays => 1, TWeeks => 7, TMonths => 30, TYears => 365)
 # sorting of a Dict is not deterministic
 const TenorSorting = sortperm(collect(keys(Curves.TenorInDays)), rev=true)
