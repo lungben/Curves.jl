@@ -92,6 +92,8 @@ function Curve(x:: AbstractVector, y:: AbstractVector;
     end
 end
 
+Base.show(io:: IO, c:: Curve) = print(io, "x = $(c.x), y = $(c.y), logx = $(c.logx), logy = $(c.logy)")
+
 "helper function to get Interpolations.jl interpolation method"
 getitpm(c1:: Curve) = isnothing(c1.etp) ? nothing : c1.etp.itp.it
 
