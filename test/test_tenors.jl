@@ -33,3 +33,6 @@ ct2 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83])
 @test get_tenor(60) == Tenor("2M")
 @test get_tenor(365) == Tenor("1y")
 @test_throws ErrorException get_tenor(-1)
+
+@test t"1W" == Tenor(Curves.TWeeks, 1)
+@test_throws KeyError t"1X"
