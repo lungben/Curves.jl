@@ -59,11 +59,29 @@ unless specified otherwise (they are not copied from input curves). This is to a
 on potentially negative values.
 =#
 
-# Define operations with scalars
 operations = (:+, :-, :*, :/, :^)
 for op in operations
+    # Define operations with scalars
     @eval $op(c1:: Curve, a:: Number; kwargs...) = Curve(c1.x, $op.(c1.y, a); sort=false, kwargs...)
     @eval $op(a:: Number, c1:: Curve; kwargs...) = Curve(c1.x, $op.(a, c1.y); sort=false, kwargs...)
+
+    # Operations with Multiple Curves
+    @eval function $op(c1:: Curve, c2:: Curve; kwargs...)
+        if c1.x == c2.x # fast mode if no interpolation is required
+            x = c1.x
+            y = $op.(c1.y, c2.y)
+        else
+            y_c1_grid = $op.(c1.y, interpolate.(c1.x, c2))
+            y_c2_grid = $op.(interpolate.(c2.x, c1), c2.y)
+            x, y = mergexy(c1.x, y_c1_grid, c2.x, y_c2_grid)
+            x, y = uniquexy(x, y)
+        end
+        Curve(x, y; sort=true, kwargs...)
+    end
+
+    # propagate missing
+    @eval $op(c1:: Curve, c2:: Missing; kwargs...) = missing
+    @eval $op(c1:: Missing, c2:: Curve; kwargs...) = missing
 end
 
 # Define operations where Curve is the only argument
@@ -208,23 +226,6 @@ end
 
 concat(c1:: Curve, cx:: Curve...) = concat(c1, concat(cx[begin], cx[begin+1:end]...))
 
-# Operations with Multiple Curves
-
-operations = (:+, :-, :*, :/, :^)
-for op in operations
-    @eval function $op(c1:: Curve, c2:: Curve; kwargs...)
-        if c1.x == c2.x # fast mode if no interpolation is required
-            x = c1.x
-            y = $op.(c1.y, c2.y)
-        else
-            y_c1_grid = $op.(c1.y, interpolate.(c1.x, c2))
-            y_c2_grid = $op.(interpolate.(c2.x, c1), c2.y)
-            x, y = mergexy(c1.x, y_c1_grid, c2.x, y_c2_grid)
-            x, y = uniquexy(x, y)
-        end
-        Curve(x, y; sort=true, kwargs...)
-    end
-end
 
 # Applying Functions
 

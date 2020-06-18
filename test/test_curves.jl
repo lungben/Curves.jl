@@ -82,6 +82,9 @@ sumc1 = c1+c1
 @test sumc1 == 2c1 # tests comparison operator in addition
 @test log(clogy/c1d).logx == false
 
+@test ismissing(missing*c1)
+@test ismissing(c2/missing)
+
 # apply
 @test apply((t,r) -> exp(-r/100*t), c1, logy=true).logy == true
 @test apply(x -> 2x, c1, axis=:y) ≈ 2c1
