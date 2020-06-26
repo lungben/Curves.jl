@@ -59,8 +59,14 @@ The `Curve` objects make it easier to shift market data, e.g. for sensitivity or
 Example:
 
 ```julia
+using Curves
+using Plots
+
 # construct zero interest rate curve
 c_zero_base = Curve(["2D", "1w", "1M", "3M", "6M", "12M"], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
+
+# plotting
+plot(c_zero_base.x, c_zero_base.y)
 
 # define zero rate shifts (e.g. for stress testing or sensitivities)
 c_shifts = Curve([2, 185, 360], [0.1, -0.1, 0.2])
@@ -78,6 +84,8 @@ log_ret = log(c_shifted_df/c_base_df)
 # apply log returns to the base curve - this should give the shifted curve back
 curve_scenario = *(c_base_df, exp(log_ret), logy=true)
 @assert curve_scenario ≈ c_shifted_df
+
+plot(curve_scenario.x, curve_scenario.y)
 ```
 
 ## Ideas for Further Improvements
