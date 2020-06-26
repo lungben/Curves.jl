@@ -3,6 +3,13 @@
 
 # Curves
 
+## Installation
+
+```julia
+using Pkg
+pkg"add Curves"
+```
+
 ## Introduction
 
 A `Curve` in this package is essentially a collection of points `(x, y)`, together with an interpolation and extrapolation method.
@@ -65,7 +72,7 @@ using Plots
 # construct zero interest rate curve
 c_zero_base = Curve(["2D", "1w", "1M", "3M", "6M", "12M"], [0.5, 0.7, 0.75, 0.83, 1.1, 1.5])
 
-# plotting
+# plotting - package Plots required
 plot(c_zero_base.x, c_zero_base.y)
 
 # define zero rate shifts (e.g. for stress testing or sensitivities)
