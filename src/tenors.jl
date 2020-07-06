@@ -10,6 +10,7 @@ struct Tenor
 end
 
 const TenorUnitMapping = Dict("D" => TDays, "W" => TWeeks, "M" => TMonths, "Y"=> TYears)
+const UnitTenorMapping = Dict(val => key for (key, val) in TenorUnitMapping )
 
 """
     Tenor(x:: AbstractString)
@@ -85,6 +86,8 @@ function get_tenor(x:: Integer):: Tenor
 end
 
 Base.Broadcast.broadcastable(q:: Tenor) = Ref(q) # treat it as a scalar in broadcasting
+
+Base.show(io:: IO, x:: Tenor) = print(io, x.multiplier, UnitTenorMapping[x.unit])
 
 Base.isless(x:: Tenor, y:: Tenor) = isless(get_days(x), get_days(y))
 

@@ -36,3 +36,8 @@ ct2 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83])
 
 @test t"1W" == Tenor(Curves.TWeeks, 1)
 @test_throws KeyError t"1X"
+
+# test pretty printing
+io = IOBuffer(append=true)
+print(io, t"1W")
+@test read(io, String) == "1W"
