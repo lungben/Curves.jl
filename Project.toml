@@ -1,7 +1,7 @@
 name = "Curves"
 uuid = "9bed79ab-e35b-4b7a-8527-918872a9571e"
 authors = ["Benjamin Lungwitz <benj.lung@googlemail.com>"]
-version = "0.2.4"
+version = "0.2.5"
 
 [deps]
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
