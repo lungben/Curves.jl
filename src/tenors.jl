@@ -26,7 +26,15 @@ Example:
 
 """
 function Tenor(x:: AbstractString)
-    unit = TenorUnitMapping[uppercase(x[end:end])]
+    try
+        unit = TenorUnitMapping[uppercase(x[end:end])]
+    catch ex
+        if ex isa KeyError
+            @error "$(uppercase(x[end:end])) is not a valid tenor multiplier (occurred in tenor $x)"
+        end
+        throw(ex)
+    end
+    
     multiplier = parse(Int, x[1:end-1])
     # remove ambiguities
     if unit == TDays && multiplier % 7 == 0

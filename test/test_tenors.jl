@@ -35,7 +35,7 @@ ct2 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83])
 @test_throws ErrorException get_tenor(-1)
 
 @test t"1W" == Tenor(Curves.TWeeks, 1)
-@test_throws KeyError t"1X"
+@test_logs (:error,"X is not a valid tenor multiplier (occurred in tenor 1X)") @test_throws KeyError t"1X"
 
 ct3 = Curve(["1D", "3W", "1M", "10y"], [0.5, 0.7, 0.75, 0.83], offset=2)
 ct4 = Curve(collect(t), [0.5, 0.7, 0.75, 0.83], offset=2)
