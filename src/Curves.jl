@@ -6,6 +6,7 @@ export ItpLinear, ItpConstant, EtpFlat, EtpLine # type constants referring to In
 export Tenor, get_days, get_tenor, @t_str
 
 using Interpolations
+using RecipesBase
 
 #=
 The Curve object is intended to be immutable, i.e. each operation on it creates a new Curve instance.
@@ -131,6 +132,8 @@ Curve(x:: Real, y:: Real; kwargs...) = Curve([x], [y]; kwargs...)
 Curve(x:: Tenor, y:: Real; kwargs...) = Curve([get_days(x)], [y]; kwargs...)
 
 Base.Broadcast.broadcastable(q:: Curve) = Ref(q) # treat it as a scalar in broadcasting
+
+@recipe plot(c::Curve) = c.x, c.y
 
 include("curve_functions.jl")
 
