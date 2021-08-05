@@ -77,6 +77,9 @@ Valid choices for ˋextrapolationˋ are:
 * ˋEtpLine()ˋ, corresponds to Interpolation.jl ˋLine()ˋ
 
 If the curve consists only of a single point, always constant extrapolation is used.
+
+* `sort=true`: per default, the input points are sorted and duplicate x-values are removed. `sort=true` is unsafe and intended to be used for Curves.jl internal operations only, where it can be guaranteed that the points are sorted and not duplicate.
+
 """
 function Curve(x:: AbstractVector, y:: AbstractVector;
         method=ItpLinear(), extrapolation=EtpFlat(), logx=false, logy=false, sort=true)
@@ -85,6 +88,7 @@ function Curve(x:: AbstractVector, y:: AbstractVector;
         return Curve(x, y, nothing, logx, logy)
     else
         if sort
+            x, y = uniquexy(x, y)
             perm = sortperm(x)
             x = x[perm]
             y = y[perm]

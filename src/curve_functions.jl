@@ -194,20 +194,6 @@ Merges two pairs of arrays x, y into a combined (along x-values) array pair.
 mergexy(x1:: AbstractArray, y1:: AbstractArray, x2:: AbstractArray, y2:: AbstractArray) = vcat(x1, x2), vcat(y1, y2)
 
 """
-    drop_duplicates(c1:: Curve)
-
-Removes duplicate x values from the curve.
-
-Note that it is not checked if the corresponding y values are identical, just an arbitrary one is kept.
-The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
-using the ˋkwargs...ˋ
-"""
-function drop_duplicates(c1:: Curve)
-    x, y = uniquexy(c1.x, c1.y)
-    Curve(x, y, sort=false, method=getitpm(c1), logx=c1.logx, logy=c1.logy, extrapolation=getetpm(c1))
-end
-
-"""
     concat(c1:: Curve, c2:: Curve; drop_dup=true, kwargs...)
 
 Merges two curves.
@@ -216,11 +202,9 @@ Element type is inferred by promotion. Dulicate points are dropped by default, u
 The output Curve is constructed using default settings, alternative settings can be passed to the Curve constructor
 using the ˋkwargs...ˋ
 """
-function concat(c1:: Curve, c2:: Curve; drop_dup=true, kwargs...)
+function concat(c1:: Curve, c2:: Curve; kwargs...)
     x_all, y_all = mergexy(c1.x, c1.y, c2.x, c2.y)
-    if drop_dup
-        x_all, y_all = uniquexy(x_all, y_all)
-    end
+    x_all, y_all = uniquexy(x_all, y_all)
     return Curve(x_all, y_all; sort=true, kwargs...)
 end
 
